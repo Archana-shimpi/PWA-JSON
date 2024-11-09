@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP Login System</title>
+    <link rel="stylesheet" type="text/css" href="new.css"> <!-- Link to your CSS file -->
+    <link rel="manifest" href="/PWA-JSON/manifest.json">
+</head>
+<body>
+    <div id="frm">
+        <h2>Login</h2>
+        <form name="f1" id="loginForm" onsubmit="submitLogin(event)">
+            <div class="form-group">
+                <label for="userName">Username:</label>
+                <input type="text" id="userName" name="userName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="passWord">Password:</label>
+                <input type="password" id="passWord" name="passWord" required>
+            </div>
+
+            <button type="submit" id="btn">Login</button>
+        </form>
+        <div id="loginResponse"></div>
+    </div>
+
+    <script>
+        function submitLogin(event) {
+            event.preventDefault(); // Prevent the form from submitting the default way
+
+            const username = document.getElementById('userName').value;
+            const password = document.getElementById('passWord').value;
+
+            // Check if both fields are filled
+            if (username === "" || password === "") {
+                document.getElementById('loginResponse').innerText = "Please provide both username and password!";
+                return;
+            }
+
+            // Prepare the data to be sent as JSON
+            const data = {
+                userName: username,
+                passWord: password
+            };
+
+            // Send the data using fetch()
+            fetch('authentication.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    window.location.href = "student_data.php";  // Redirect on success
+                } else {
+                    document.getElementById('loginResponse').innerText = result.message;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/project-JSON/service-worker.js')
+            .then(reg => console.log('Service Worker registered!', reg))
+            .catch(err => console.log('Service Worker registration failed!', err));
+          });
+        }
+      </script>
+      
+</body>
+</html>
